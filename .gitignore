@@ -3,53 +3,46 @@
 bin/
 obj/
 out/
-dist/
-build/
-*.exe
 *.dll
+*.exe
+*.pdb
 *.so
 *.dylib
 *.class
-*.o
-*.obj
-*.out
 
 # Dependencies
 packages/
 node_modules/
 vendor/
-lib/
-deps/
 
 # Logs
 *.log
-
-# OS generated files
-.DS_Store
-Thumbs.db
+logs/
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# Editor/IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Test and coverage
 coverage/
 htmlcov/
 .coverage
 *.cover
-.nyc_output/
 
-# Configuration specific to project type
-**/Debug/
-**/Release/
-**/x64/
-**/x86/
+# Distribution
+dist/
+build/
+target/
 ```

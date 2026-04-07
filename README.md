@@ -1,151 +1,98 @@
-# Beauty E-Commerce System
+# Beauty E-commerce Platform
 
-## Overview
+Production-ready e-commerce system for cosmetics online based on SPEC V3.
 
-Production-ready e-commerce platform for cosmetics built with:
-- **Backend**: .NET 8, ASP.NET Core Web API, Clean Architecture
-- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui
-- **Database**: PostgreSQL 16 with read replica support
-- **Cache**: Redis
+## Tech Stack
+
+- **Backend**: .NET 8, ASP.NET Core Web API, Minimal API
+- **Frontend**: Next.js 15 (App Router, TypeScript, Tailwind CSS, shadcn/ui)
+- **Database**: PostgreSQL 16 (Primary + Read Replica)
+- **Caching**: Redis (StackExchange.Redis)
 - **Search**: Elasticsearch 8.x
-- **Message Queue**: Hangfire + Outbox Pattern
-- **Real-time**: SignalR with Redis backplane
+- **Message/Background**: Hangfire (Redis storage) + Outbox Pattern
+- **Orchestration**: Saga (OrderSaga) + compensating transactions
+- **Resilience**: Polly (Retry, Circuit Breaker, Timeout, Fallback)
+- **Realtime**: SignalR + Redis backplane
+- **Logging**: Serilog + Seq
 
-## Quick Start
+## Getting Started
 
 ### Prerequisites
+
 - Docker & Docker Compose
-- Node.js 20+
 - .NET 8 SDK
+- Node.js 20+
 
-### Development Setup
+### Quick Start
 
-1. **Start infrastructure**
+1. **Start infrastructure services:**
 ```bash
-docker-compose up -d postgres redis elasticsearch seq adminer
+docker-compose up -d
 ```
 
-2. **Run Backend**
+2. **Run database migrations:**
 ```bash
 cd src/Api
-dotnet restore
 dotnet ef database update
+```
+
+3. **Start the API:**
+```bash
 dotnet run
 ```
 
-3. **Run Frontend**
+4. **Start the frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-4. **Access Services**
-- Frontend: http://localhost:3000
-- API: http://localhost:5000
-- Adminer: http://localhost:8082
-- Seq Logs: http://localhost:8081
-- Elasticsearch: http://localhost:9200
-
-### Full Docker Setup
-
-```bash
-docker-compose up -d
-```
-
 ## Architecture
 
-### Clean Architecture Layers
+### Clean Architecture (Modular Monolith)
 
 ```
 src/
-├── Domain/           # Entities, Value Objects, Domain Events
-├── Application/      # CQRS, MediatR, DTOs, Validators
-├── Infrastructure/   # EF Core, Redis, Elasticsearch, External APIs
-└── Api/             # Controllers, Middleware, Hubs
+├── Domain/               # Entities, Value Objects, Domain Events, Repository Interfaces
+├── Application/          # Commands/Queries, MediatR Handlers, DTOs, Validators
+├── Infrastructure/       # EF Core Repositories, Outbox, Saga, Redis, Elasticsearch, Polly
+└── Api/                  # Controllers, Middleware, SignalR Hubs, Hangfire Dashboard
 ```
 
-### Key Patterns Implemented
+## Authentication Features
 
-- **Outbox Pattern**: Reliable event publishing with lease-based distributed locking
-- **Saga Orchestrator**: Order processing with compensating transactions
-- **CQRS**: Command (EF Core) / Query (Dapper) separation
-- **Soft Delete**: Global query filters with `deleted_at` column
-- **Row Versioning**: Optimistic concurrency with `row_version`
-- **Idempotency**: X-Idempotency-Key header for all write operations
-- **Circuit Breaker**: Polly policies for external API calls
-- **Cursor Pagination**: Efficient pagination without OFFSET
+- JWT + Refresh Token Family with rotation
+- MFA (TOTP) support
+- Account lockout after failed attempts
+- Token reuse detection
 
-## Database Schema
+### Auth Endpoints
 
-### Core Tables
-- `users`, `user_addresses`, `skin_profiles`
-- `products`, `product_translations`, `categories`, `brands`
-- `inventory_lots`, `stock_movements`
-- `carts`, `cart_items`
-- `orders`, `order_items`, `order_status_history`
-- `payments`, `refunds`
-- `shipments`
-- `outbox_messages`
-- `order_saga_state`, `saga_compensation_log`
-- `wallet_transactions`, `gift_cards`
-- `reviews`, `wishlists`, `recently_viewed`
-- `audit_logs`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register` | Register new user |
+| POST | `/api/v1/auth/login` | Login with email/password |
+| POST | `/api/v1/auth/refresh-token` | Refresh access token |
+| POST | `/api/v1/auth/enable-mfa` | Enable MFA |
+| POST | `/api/v1/auth/verify-mfa` | Verify MFA code |
+| POST | `/api/v1/auth/logout` | Logout |
+| GET | `/api/v1/auth/me` | Get current user |
 
-## API Endpoints
+## Development
 
-### Public APIs
-- `GET /api/v1/products` - List products with filters
-- `GET /api/v1/products/{slug}` - Product details
-- `GET /api/v1/search/suggest?q=` - Search autocomplete
+### Running Tests
 
-### Customer APIs (Authenticated)
-- `GET /api/v1/carts/me` - Get cart
-- `POST /api/v1/carts/me/items` - Add to cart
-- `POST /api/v1/carts/me/checkout` - Checkout (idempotent)
-- `GET /api/v1/orders/me` - Order history (cursor pagination)
-- `POST /api/v1/orders/{id}/partial-cancel` - Partial cancel
-
-## Testing
-
-### Unit Tests
 ```bash
-dotnet test --filter "Category=Unit"
+dotnet test
 ```
 
-### Integration Tests
+### Building Docker Images
+
 ```bash
-dotnet test --filter "Category=Integration"
-```
-
-### Load Tests (k6)
-```bash
-k6 run tests/k6/smoke.js
-```
-
-## Project Structure
-
-```
-/workspace
-├── src/
-│   ├── Domain/
-│   ├── Application/
-│   ├── Infrastructure/
-│   └── Api/
-├── frontend/
-│   ├── src/app/
-│   ├── src/components/
-│   ├── src/hooks/
-│   ├── src/lib/
-│   ├── src/store/
-│   └── src/types/
-├── tests/
-├── k8s/
-├── .github/workflows/
-├── docker-compose.yml
-└── docker-compose.override.yml
+docker-compose build
 ```
 
 ## License
 
-Proprietary - All rights reserved
+Private - All rights reserved

@@ -8,74 +8,142 @@ using BeautyEcommerce.Domain.Enums;
 /// </summary>
 public class User : BaseEntity, IAggregateRoot
 {
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
-    public string FullName { get; set; } = string.Empty;
-    public string? PhoneNumber { get; set; }
-    public UserRole Role { get; set; } = UserRole.Customer;
-    public bool IsEmailVerified { get; set; }
-    public bool IsPhoneVerified { get; set; }
-    public bool MfaEnabled { get; set; }
-    public string? MfaSecret { get; set; }
-    public DateTime? LastLoginAt { get; set; }
-    public string? AvatarUrl { get; set; }
-    
+    public string Email { get; private set; } = string.Empty;
+    public string PasswordHash { get; private set; } = string.Empty;
+    public string? FullName { get; private set; }
+    public string? PhoneNumber { get; private set; }
+    public UserRole Role { get; private set; } = UserRole.Customer;
+    public bool IsEmailVerified { get; private set; }
+    public bool IsPhoneVerified { get; private set; }
+    public bool MfaEnabled { get; private set; }
+    public string? MfaSecret { get; private set; }
+    public int FailedLoginAttempts { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
+    public DateTime? LastLoginAt { get; private set; }
+    public string? AvatarUrl { get; private set; }
+    public bool IsActive { get; private set; } = true;
+
     // Navigation properties
-    public virtual ICollection<UserAddress> Addresses { get; set; } = new List<UserAddress>();
-    public virtual ICollection<SkinProfile> SkinProfiles { get; set; } = new List<SkinProfile>();
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
-    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-    public virtual ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();
+    public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
+    public virtual ICollection<UserAddress> Addresses { get; private set; } = new List<UserAddress>();
+    public virtual ICollection<SkinProfile> SkinProfiles { get; private set; } = new List<SkinProfile>();
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
+    public virtual ICollection<Cart> Carts { get; private set; } = new List<Cart>();
+    public virtual ICollection<Wishlist> Wishlists { get; private set; } = new List<Wishlist>();
+    public virtual ICollection<Review> Reviews { get; private set; } = new List<Review>();
+    public virtual ICollection<WalletTransaction> WalletTransactions { get; private set; } = new List<WalletTransaction>();
+    public virtual ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
+
+    private User() { }
+
+    public static User Create(string email, string passwordHash, string? fullName = null)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email.ToLower().Trim(),
+            PasswordHash = passwordHash,
+            FullName = fullName,
+            Role = UserRole.Customer,
+            IsEmailVerified = false,
+            IsPhoneVerified = false,
+            MfaEnabled = false,
+            IsActive = true,
+            FailedLoginAttempts = 0,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        user.AddDomainEvent(new UserCreatedEvent(user.Id, user.Email));
+        return user;
+    }
+
+    public void UpdateLastLogin()
+    {
+        LastLoginAt = DateTime.UtcNow;
+        FailedLoginAttempts = 0;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void RecordFailedLogin()
+    {
+        FailedLoginAttempts++;
+        if (FailedLoginAttempts >= 5)
+        {
+            LockedUntil = DateTime.UtcNow.AddMinutes(15);
+        }
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Unlock()
+    {
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public bool IsLocked() => LockedUntil.HasValue && LockedUntil.Value > DateTime.UtcNow;
+
+    public void EnableMfa(string secret)
+    {
+        MfaEnabled = true;
+        MfaSecret = secret;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void DisableMfa()
+    {
+        MfaEnabled = false;
+        MfaSecret = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void VerifyEmail()
+    {
+        IsEmailVerified = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdatePassword(string newPasswordHash)
+    {
+        PasswordHash = newPasswordHash;
+        UpdatedAt = DateTime.UtcNow;
+        AddDomainEvent(new PasswordChangedEvent(Id));
+    }
+
+    public void UpdateProfile(string? fullName, string? phoneNumber, string? avatarUrl)
+    {
+        if (fullName != null) FullName = fullName;
+        if (phoneNumber != null) PhoneNumber = phoneNumber;
+        if (avatarUrl != null) AvatarUrl = avatarUrl;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetRole(UserRole role)
+    {
+        Role = role;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }
 
-/// <summary>
-/// User address entity
-/// </summary>
-public class UserAddress : BaseEntity
+public class UserCreatedEvent : IDomainEvent
 {
-    public Guid UserId { get; set; }
-    public string FullName { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-    public string AddressLine1 { get; set; } = string.Empty;
-    public string? AddressLine2 { get; set; }
-    public string Ward { get; set; } = string.Empty;
-    public string District { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string Country { get; set; } = "VN";
-    public string? PostalCode { get; set; }
-    public bool IsDefault { get; set; }
-    public AddressType Type { get; set; } = AddressType.Home;
-    
-    // Navigation properties
-    public virtual User User { get; set; } = null!;
+    public Guid UserId { get; }
+    public string Email { get; }
+
+    public UserCreatedEvent(Guid userId, string email)
+    {
+        UserId = userId;
+        Email = email;
+    }
 }
 
-public enum AddressType
+public class PasswordChangedEvent : IDomainEvent
 {
-    Home = 0,
-    Office = 1,
-    Other = 2
-}
+    public Guid UserId { get; }
 
-/// <summary>
-/// Skin profile for beauty recommendations
-/// </summary>
-public class SkinProfile : BaseEntity
-{
-    public Guid UserId { get; set; }
-    public string ProfileName { get; set; } = string.Empty;
-    public Gender Gender { get; set; }
-    public int Age { get; set; }
-    public SkinType SkinType { get; set; }
-    public bool HasAcne { get; set; }
-    public bool HasDarkSpots { get; set; }
-    public bool HasWrinkles { get; set; }
-    public bool IsSensitive { get; set; }
-    public string? Concerns { get; set; }
-    public string? CurrentProducts { get; set; }
-    
-    // Navigation properties
-    public virtual User User { get; set; } = null!;
+    public PasswordChangedEvent(Guid userId)
+    {
+        UserId = userId;
+    }
 }
