@@ -1,0 +1,200 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20.x'
+
+jobs:
+  # 1. Lint & Format Check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install dependencies (Backend)
+        run: dotnet restore
+      
+      - name: Check format (Backend)
+        run: dotnet format --verify-no-changes --no-restore
+      
+      - name: Install dependencies (Frontend)
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Lint (Frontend)
+        run: |
+          cd frontend
+          npm run lint
+
+  # 2. Unit Tests
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Run Unit Tests
+        run: dotnet test --configuration Release --filter "Category=Unit" --logger "trx;LogFileName=unit-results.trx"
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: "**/*.trx"
+
+  # 3. Integration Tests (Testcontainers)
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Run Integration Tests
+        run: dotnet test --configuration Release --filter "Category=Integration" --logger "trx;LogFileName=integration-results.trx"
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=test_db;Username=test_user;Password=test_password"
+          ConnectionStrings__Redis: "localhost:6379"
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
+          path: "**/*.trx"
+
+  # 4. Build Docker Images
+  build:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Build Backend
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Build Docker Image (Backend)
+        run: docker build -t beautycommerce-api:${{ github.sha }} -f src/Api/Dockerfile .
+      
+      - name: Build Docker Image (Frontend)
+        run: |
+          cd frontend
+          docker build -t beautycommerce-frontend:${{ github.sha }} .
+
+  # 5. OpenAPI Diff Check
+  openapi-diff:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Generate OpenAPI (Base)
+        run: |
+          git checkout ${{ github.base_ref }}
+          dotnet run --project src/Api --swagger-output openapi-base.json
+      
+      - name: Generate OpenAPI (Head)
+        run: |
+          git checkout ${{ github.head_ref }}
+          dotnet run --project src/Api --swagger-output openapi-head.json
+      
+      - name: Install oasdiff
+        run: go install github.com/tufin/oasdiff@latest
+      
+      - name: Check Breaking Changes
+        run: oasdiff breaking openapi-base.json openapi-head.json
+
+  # 6. k6 Smoke Test
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup k6
+        uses: grafana/k6-action@v0.3.0
+      
+      - name: Run Smoke Test
+        run: k6 run tests/k6/smoke.js
+        env:
+          BASE_URL: http://localhost:5000
+
+  # 7. Deploy to Staging (on main branch)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [build, smoke-test]
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Kubernetes (Staging)
+        run: |
+          echo "Deploying to staging cluster..."
+          # kubectl apply -f k8s/staging/
+          # Implement actual deployment logic
