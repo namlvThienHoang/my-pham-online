@@ -1,7 +1,7 @@
-namespace BeautyCommerce.Domain.Entities;
+namespace BeautyEcommerce.Domain.Entities;
 
-using BeautyCommerce.Domain.Common;
-using BeautyCommerce.Domain.Enums;
+using BeautyEcommerce.Domain.Common;
+using BeautyEcommerce.Domain.Enums;
 
 /// <summary>
 /// User entity with soft delete and row versioning

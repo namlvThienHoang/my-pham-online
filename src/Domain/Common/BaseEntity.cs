@@ -1,4 +1,4 @@
-namespace BeautyCommerce.Domain.Common;
+namespace BeautyEcommerce.Domain.Common;
 
 /// <summary>
 /// Base entity with soft delete, row versioning, and audit fields
