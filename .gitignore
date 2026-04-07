@@ -1,39 +1,55 @@
 ```
-# Dependencies
-node_modules/
-
-# Build outputs
+# Build artifacts
+bin/
+obj/
+out/
 dist/
 build/
-.next/
+*.exe
+*.dll
+*.so
+*.dylib
+*.class
+*.o
+*.obj
+*.out
 
-# Environment variables
+# Dependencies
+packages/
+node_modules/
+vendor/
+lib/
+deps/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment
 .env
 .env.local
 *.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *.tmp
 
-# Logs
-*.log
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Coverage
+# Test and coverage
 coverage/
 htmlcov/
 .coverage
+*.cover
+.nyc_output/
 
-# OS
-.DS_Store
-Thumbs.db
+# Configuration specific to project type
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
 ```
