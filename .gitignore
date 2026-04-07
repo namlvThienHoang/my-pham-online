@@ -1,69 +1,31 @@
 ```
-# Build artifacts
-*.dll
-*.exe
-*.pdb
-*.so
-*.dylib
-*.obj
-*.o
-*.a
-*.lib
-*.out
-
-# Dependency directories
+# Dependencies
 packages/
-node_modules/
-vendor/
+*.nupkg
+*.snupkg
 
-# Output directories
+# Build results
 bin/
 obj/
 out/
-dist/
-build/
-target/
+publish/
 
-# IDE files
-.vs/
-.idea/
-*.userprefs
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
+# Test results
+TestResults/
+*.trx
 
-# Log files
-*.log
-
-# Environment variables
+# Environment specific settings
 .env
 .env.local
-*.env.*
+*.user
+*.userosscache
+*.suo
+
+# IDE
+.vs/
+*.userprefs
 
 # OS generated files
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# Test coverage
-coverage/
-htmlcov/
-*.coverage
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
-# Cache directories
-.cache/
-.mypy_cache/
-.pytest_cache/
-.gradle/
-.npm/
-.yarn/
-
-# Local configuration
-local.properties
 ```

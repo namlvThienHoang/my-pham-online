@@ -1,6 +1,39 @@
 version: '3.8'
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: beauty_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=beauty_ecommerce;Username=postgres;Password=postgres123;Include Error Detail=true
+      - ConnectionStrings__Redis=redis:6379
+      - ConnectionStrings__Elasticsearch=http://elasticsearch:9200
+      - Jwt__Key=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+      - Jwt__Issuer=BeautyCommerce
+      - Jwt__Audience=BeautyCommerceUsers
+      - Seq__Url=http://seq:80
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./src/Api/appsettings.json:/app/appsettings.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   postgres:
     image: postgres:16-alpine
     container_name: beauty_postgres
@@ -12,6 +45,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -25,6 +59,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -55,8 +90,7 @@ services:
     environment:
       - ACCEPT_EULA=Y
     ports:
-      - "5341:5341"
-      - "8081:80"
+      - "5341:80"
     volumes:
       - seq_data:/data
 
