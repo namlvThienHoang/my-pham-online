@@ -1,31 +1,39 @@
 ```
 # Dependencies
-packages/
-*.nupkg
-*.snupkg
+node_modules/
 
-# Build results
-bin/
-obj/
-out/
-publish/
+# Build outputs
+dist/
+build/
+.next/
 
-# Test results
-TestResults/
-*.trx
-
-# Environment specific settings
+# Environment variables
 .env
 .env.local
-*.user
-*.userosscache
-*.suo
+*.env.*
 
-# IDE
-.vs/
-*.userprefs
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
-# OS generated files
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# OS
 .DS_Store
 Thumbs.db
 ```
