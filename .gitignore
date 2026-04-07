@@ -1,70 +1,75 @@
-# Compiled and build artifacts
-*.exe
+```
+# Build artifacts
+bin/
+obj/
 *.dll
+*.exe
+*.pdb
 *.so
-*.a
-*.obj
-*.out
-*.pyc
+*.dylib
+*.jar
+*.war
 *.class
-*.o
 
 # Dependencies
 node_modules/
-venv/
-.venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
+packages/
 
-# Build directories
-dist/
-build/
+# Logs
+*.log
+logs/
 
-# Editors
+# Environment
+.env
+.env.local
+*.env.*
+
+# Tests
+TestResults/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Logs and temp files
-*.log
-*.tmp
-
-# System files
-.DS_Store
-Thumbs.db
-.env
-.env.local
-*.env.*
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
+# Distribution / packaging
+dist/
+build/
+*.msi
 *.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+*.rpm
+
+# Compiled Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+.venv*/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Cache
+.cache/
+.mypy_cache/
+.pytest_cache/
+.nyc_output/
+coverage/
+```

@@ -1,27 +1,27 @@
 namespace BeautyEcommerce.Domain.Enums;
 
 /// <summary>
-/// Order status enum (PostgreSQL ENUM)
+/// Order status enum (PostgreSQL ENUM) - 17 states as per spec
 /// </summary>
 public enum OrderStatus
 {
-    Pending = 0,
-    AwaitingPayment = 1,
-    PaymentPending = 2,
-    Paid = 3,
-    Confirmed = 4,
-    Processing = 5,
-    PartiallyShipped = 6,
-    Shipped = 7,
-    OutForDelivery = 8,
-    Delivered = 9,
-    Completed = 10,
-    Cancelled = 11,
-    Refunding = 12,
-    Refunded = 13,
-    ReturnRequested = 14,
-    ReturnApproved = 15,
-    ReturnRejected = 16
+    Pending = 0,              // Đơn hàng chờ xử lý
+    PaymentPending = 1,       // Chờ thanh toán
+    PaymentProcessing = 2,    // Đang xử lý thanh toán
+    Paid = 3,                 // Đã thanh toán
+    Confirmed = 4,            // Đã xác nhận
+    Processing = 5,           // Đang chuẩn bị hàng
+    Packing = 6,              // Đang đóng gói
+    Shipped = 7,              // Đã giao cho đơn vị vận chuyển
+    Delivering = 8,           // Đang giao hàng
+    Delivered = 9,            // Đã giao thành công
+    Completed = 10,           // Hoàn thành
+    Cancelled = 11,           // Đã hủy
+    RefundRequested = 12,     // Yêu cầu hoàn tiền
+    RefundProcessing = 13,    // Đang xử lý hoàn tiền
+    Refunded = 14,            // Đã hoàn tiền
+    Failed = 15,              // Thất bại
+    Expired = 16              // Hết hạn
 }
 
 /// <summary>
