@@ -5,40 +5,22 @@ services:
     image: postgres:16-alpine
     container_name: beauty_postgres
     environment:
-      POSTGRES_USER: beauty_user
-      POSTGRES_PASSWORD: beauty_password_123
-      POSTGRES_DB: beauty_commerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: beauty_ecommerce
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U beauty_user -d beauty_commerce"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - beauty_network
-
-  postgres_read_replica:
-    image: postgres:16-alpine
-    container_name: beauty_postgres_replica
-    environment:
-      POSTGRES_USER: beauty_user
-      POSTGRES_PASSWORD: beauty_password_123
-      POSTGRES_DB: beauty_commerce
-    ports:
-      - "5433:5432"
-    depends_on:
-      - postgres
-    networks:
-      - beauty_network
 
   redis:
     image: redis:7-alpine
     container_name: beauty_redis
-    command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
@@ -48,11 +30,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - beauty_network
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     container_name: beauty_elasticsearch
     environment:
       - discovery.type=single-node
@@ -68,8 +48,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-    networks:
-      - beauty_network
 
   seq:
     image: datalust/seq:latest
@@ -77,27 +55,20 @@ services:
     environment:
       - ACCEPT_EULA=Y
     ports:
-      - "5341:80"
+      - "5341:5341"
+      - "8081:80"
     volumes:
       - seq_data:/data
-    networks:
-      - beauty_network
 
   adminer:
     image: adminer:latest
     container_name: beauty_adminer
-    environment:
-      - ADMINER_DEFAULT_SERVER=postgres
     ports:
       - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
     depends_on:
       - postgres
-    networks:
-      - beauty_network
-
-networks:
-  beauty_network:
-    driver: bridge
 
 volumes:
   postgres_data:

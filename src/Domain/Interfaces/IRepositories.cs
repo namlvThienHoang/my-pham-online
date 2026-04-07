@@ -1,6 +1,6 @@
-namespace BeautyCommerce.Domain.Interfaces;
+namespace BeautyEcommerce.Domain.Interfaces;
 
-using BeautyCommerce.Domain.Common;
+using BeautyEcommerce.Domain.Common;
 
 /// <summary>
 /// Generic repository interface

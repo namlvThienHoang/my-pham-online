@@ -1,7 +1,7 @@
-namespace BeautyCommerce.Domain.Entities;
+namespace BeautyEcommerce.Domain.Entities;
 
-using BeautyCommerce.Domain.Common;
-using BeautyCommerce.Domain.Enums;
+using BeautyEcommerce.Domain.Common;
+using BeautyEcommerce.Domain.Enums;
 
 /// <summary>
 /// Outbox message for reliable event publishing

@@ -1,4 +1,4 @@
-namespace BeautyCommerce.Domain.Enums;
+namespace BeautyEcommerce.Domain.Enums;
 
 /// <summary>
 /// Order status enum (PostgreSQL ENUM)
