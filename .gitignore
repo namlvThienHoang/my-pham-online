@@ -1,50 +1,51 @@
 ```
-# Dependencies
-node_modules/
-packages/
-
 # Build artifacts
 bin/
 obj/
-dist/
-build/
-publish/
-
-# Logs
-*.log
-
-# Environment
-.env
-.env.local
-.env.*
-
-# IDE
-.vscode/
-.idea/
-*.userprefs
-*.useroptions
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Compiled files
 *.dll
 *.exe
 *.pdb
 *.so
 *.dylib
+*.jar
+*.war
+*.class
+
+# Dependencies
+packages/
+node_modules/
+.nuget/
+.nyc_output/
+coverage/
+
+# IDE specific
+.vs/
+.idea/
+*.userprefs
+*.swp
+*.swo
+
+# OS generated
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+*.out
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Test and coverage
+coverage/
+htmlcov/
+.coverage
+.nyc_output/
 
 # Temporary files
 *.tmp
 *~
-*.swp
-
-# Testing
-TestResults/
-coverage/
-
-# NuGet
-*.nupkg
-packages/
 ```
