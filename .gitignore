@@ -1,75 +1,50 @@
 ```
+# Dependencies
+node_modules/
+packages/
+
 # Build artifacts
 bin/
 obj/
+dist/
+build/
+publish/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.userprefs
+*.useroptions
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled files
 *.dll
 *.exe
 *.pdb
 *.so
 *.dylib
-*.jar
-*.war
-*.class
-
-# Dependencies
-node_modules/
-packages/
-
-# Logs
-*.log
-logs/
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Tests
-TestResults/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Distribution / packaging
-dist/
-build/
-*.msi
-*.deb
-*.rpm
-
-# Compiled Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environments
-venv/
-.venv/
-env/
-.venv*/
 
 # Temporary files
 *.tmp
-*.temp
-*.bak
+*~
+*.swp
 
-# Cache
-.cache/
-.mypy_cache/
-.pytest_cache/
-.nyc_output/
+# Testing
+TestResults/
 coverage/
+
+# NuGet
+*.nupkg
+packages/
 ```
