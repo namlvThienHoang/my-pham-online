@@ -14,38 +14,30 @@ obj/
 # Dependencies
 packages/
 node_modules/
-.nuget/
-.nyc_output/
-coverage/
-
-# IDE specific
-.vs/
-.idea/
-*.userprefs
-*.swp
-*.swo
-
-# OS generated
-.DS_Store
-Thumbs.db
-ehthumbs.db
+vendor/
 
 # Logs
 *.log
-*.out
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Test and coverage
 coverage/
 htmlcov/
 .coverage
+*.cover
 .nyc_output/
-
-# Temporary files
-*.tmp
-*~
 ```
