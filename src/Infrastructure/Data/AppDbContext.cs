@@ -73,6 +73,28 @@ public class AppDbContext : DbContext, IUnitOfWork
     // Notification
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    // Skin Consultation & Quiz
+    public DbSet<SkinProfile> SkinProfiles => Set<SkinProfile>();
+    public DbSet<QuizQuestion> QuizQuestions => Set<QuizQuestion>();
+    public DbSet<QuizAnswer> QuizAnswers => Set<QuizAnswer>();
+    public DbSet<QuizResult> QuizResults => Set<QuizResult>();
+    public DbSet<QuizAnswerLog> QuizAnswerLogs => Set<QuizAnswerLog>();
+    public DbSet<ProductRecommendation> ProductRecommendations => Set<ProductRecommendation>();
+
+    // Routine Tracker
+    public DbSet<SkincareRoutine> SkincareRoutines => Set<SkincareRoutine>();
+    public DbSet<RoutineStep> RoutineSteps => Set<RoutineStep>();
+    public DbSet<RoutineLog> RoutineLogs => Set<RoutineLog>();
+    public DbSet<StepLog> StepLogs => Set<StepLog>();
+    public DbSet<Reminder> Reminders => Set<Reminder>();
+
+    // Product Expiry & Replenishment
+    public DbSet<UserProduct> UserProducts => Set<UserProduct>();
+    public DbSet<UsageLog> UsageLogs => Set<UsageLog>();
+    public DbSet<ExpiryAlert> ExpiryAlerts => Set<ExpiryAlert>();
+    public DbSet<ReplenishmentSubscription> ReplenishmentSubscriptions => Set<ReplenishmentSubscription>();
+    public DbSet<ReplenishmentOrder> ReplenishmentOrders => Set<ReplenishmentOrder>();
+
     // Audit & System
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
