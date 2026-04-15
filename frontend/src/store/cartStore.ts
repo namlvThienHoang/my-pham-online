@@ -6,6 +6,7 @@ interface CartStore {
   cart: Cart | null;
   isLoading: boolean;
   error: string | null;
+  isOpen: boolean;
   setCart: (cart: Cart | null) => void;
   addItem: (productId: string, variant: ProductVariant, quantity: number) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
@@ -13,6 +14,9 @@ interface CartStore {
   clearCart: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -21,6 +25,11 @@ export const useCartStore = create<CartStore>()(
       cart: null,
       isLoading: false,
       error: null,
+      isOpen: false,
+
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
+      toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
       setCart: (cart) => set({ cart }),
 

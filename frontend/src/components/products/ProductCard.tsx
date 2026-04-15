@@ -65,6 +65,20 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
 
+          {/* Chính hãng badge */}
+          {product.inStock && (
+            <span className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">
+              Chính hãng
+            </span>
+          )}
+
+          {/* Freeship badge */}
+          {product.tags?.includes('freeship') && (
+            <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+              Freeship
+            </span>
+          )}
+
           <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
               size="icon"
@@ -124,10 +138,10 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
 
           <Button
-            className="w-full mt-2"
+            className="w-full mt-2 h-10"
             onClick={handleAddToCart}
             disabled={!product.inStock || isAdding}
-            size="sm"
+            size="lg"
           >
             {isAdding ? (
               'Đang thêm...'
