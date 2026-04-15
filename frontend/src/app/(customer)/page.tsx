@@ -1,5 +1,6 @@
 import { ProductCard } from '@/components/products/ProductCard';
 import { useProducts } from '@/hooks/useQueries';
+import { TrustBadges } from '@/components/trust/TrustBadges';
 
 export default function HomePage() {
   const { data: featuredProducts, isLoading } = useProducts({ limit: 8, sort: 'createdAt', order: 'desc' });
@@ -35,6 +36,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Trust Badges */}
+      <TrustBadges />
 
       {/* Featured Products */}
       <section className="container">
